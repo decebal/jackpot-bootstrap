@@ -1,0 +1,144 @@
+stages:
+  - validate
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: registry.example.com
+  KUBERNETES_NAMESPACE: jackpot
+
+# Cache dependencies between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
+# Validate stage
+lint:
+  stage: validate
+  image: oven/bun:1.0
+  script:
+    - bun install --frozen-lockfile
+    - bun run lint
+  only:
+    - main
+    - merge_requests
+
+type-check:
+  stage: validate
+  image: oven/bun:1.0
+  script:
+    - bun install --frozen-lockfile
+    - bun run typecheck
+  only:
+    - main
+    - merge_requests
+
+# Build stage
+build-gateway:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $DOCKER_REGISTRY
+    - docker build -t $DOCKER_REGISTRY/jackpot/gateway:$CI_COMMIT_SHA -t $DOCKER_REGISTRY/jackpot/gateway:latest -f apps/gateway/Dockerfile .
+    - docker push $DOCKER_REGISTRY/jackpot/gateway:$CI_COMMIT_SHA
+    - docker push $DOCKER_REGISTRY/jackpot/gateway:latest
+  only:
+    - main
+    - tags
+
+build-engine:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $DOCKER_REGISTRY
+    - docker build -t $DOCKER_REGISTRY/jackpot/engine:$CI_COMMIT_SHA -t $DOCKER_REGISTRY/jackpot/engine:latest -f apps/engine/Dockerfile .
+    - docker push $DOCKER_REGISTRY/jackpot/engine:$CI_COMMIT_SHA
+    - docker push $DOCKER_REGISTRY/jackpot/engine:latest
+  only:
+    - main
+    - tags
+
+build-metrics:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $DOCKER_REGISTRY
+    - docker build -t $DOCKER_REGISTRY/jackpot/metrics:$CI_COMMIT_SHA -t $DOCKER_REGISTRY/jackpot/metrics:latest -f apps/metrics/Dockerfile .
+    - docker push $DOCKER_REGISTRY/jackpot/metrics:$CI_COMMIT_SHA
+    - docker push $DOCKER_REGISTRY/jackpot/metrics:latest
+  only:
+    - main
+    - tags
+
+# Test stage
+test-gateway:
+  stage: test
+  image: oven/bun:1.0
+  script:
+    - bun install --frozen-lockfile
+    - bun run test:gateway
+  only:
+    - main
+    - merge_requests
+
+test-engine:
+  stage: test
+  image: oven/bun:1.0
+  script:
+    - bun install --frozen-lockfile
+    - bun run test:engine
+  only:
+    - main
+    - merge_requests
+
+test-metrics:
+  stage: test
+  image: oven/bun:1.0
+  script:
+    - bun install --frozen-lockfile
+    - bun run test:metrics
+  only:
+    - main
+    - merge_requests
+
+# Deploy stage
+deploy-dev:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl config use-context dev
+    - kubectl set image deployment/gateway-deployment gateway=$DOCKER_REGISTRY/jackpot/gateway:$CI_COMMIT_SHA -n $KUBERNETES_NAMESPACE
+    - kubectl set image deployment/engine-deployment engine=$DOCKER_REGISTRY/jackpot/engine:$CI_COMMIT_SHA -n $KUBERNETES_NAMESPACE
+    - kubectl set image deployment/metrics-deployment metrics=$DOCKER_REGISTRY/jackpot/metrics:$CI_COMMIT_SHA -n $KUBERNETES_NAMESPACE
+    - kubectl rollout status deployment/gateway-deployment -n $KUBERNETES_NAMESPACE
+    - kubectl rollout status deployment/engine-deployment -n $KUBERNETES_NAMESPACE
+    - kubectl rollout status deployment/metrics-deployment -n $KUBERNETES_NAMESPACE
+  environment:
+    name: development
+  only:
+    - main
+
+deploy-prod:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl config use-context prod
+    - kubectl set image deployment/gateway-deployment gateway=$DOCKER_REGISTRY/jackpot/gateway:$CI_COMMIT_SHA -n $KUBERNETES_NAMESPACE
+    - kubectl set image deployment/engine-deployment engine=$DOCKER_REGISTRY/jackpot/engine:$CI_COMMIT_SHA -n $KUBERNETES_NAMESPACE
+    - kubectl set image deployment/metrics-deployment metrics=$DOCKER_REGISTRY/jackpot/metrics:$CI_COMMIT_SHA -n $KUBERNETES_NAMESPACE
+    - kubectl rollout status deployment/gateway-deployment -n $KUBERNETES_NAMESPACE
+    - kubectl rollout status deployment/engine-deployment -n $KUBERNETES_NAMESPACE
+    - kubectl rollout status deployment/metrics-deployment -n $KUBERNETES_NAMESPACE
+  environment:
+    name: production
+  only:
+    - tags
+  when: manual

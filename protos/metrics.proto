@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package metrics;
+
+service MetricsService {
+  rpc CollectMetrics (CollectMetricsRequest) returns (CollectMetricsResponse) {}
+  rpc GetMetrics (GetMetricsRequest) returns (GetMetricsResponse) {}
+  rpc GenerateReport (GenerateReportRequest) returns (GenerateReportResponse) {}
+}
+
+message CollectMetricsRequest {
+  string source = 1;
+  string event_type = 2;
+  bytes data = 3;
+  string timestamp = 4;
+}
+
+message CollectMetricsResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+}
+
+message GetMetricsRequest {
+  string source = 1;
+  string event_type = 2;
+  string start_date = 3;
+  string end_date = 4;
+  int32 limit = 5;
+  int32 offset = 6;
+}
+
+message GetMetricsResponse {
+  bool success = 1;
+  repeated MetricData metrics = 2;
+  int32 total_count = 3;
+  string error = 4;
+}
+
+message MetricData {
+  string id = 1;
+  string source = 2;
+  string event_type = 3;
+  bytes data = 4;
+  string timestamp = 5;
+}
+
+message GenerateReportRequest {
+  string report_type = 1;
+  string start_date = 2;
+  string end_date = 3;
+  string format = 4; // e.g., "json", "csv"
+}
+
+message GenerateReportResponse {
+  bool success = 1;
+  string report_id = 2;
+  bytes report_data = 3;
+  string error = 4;
+}

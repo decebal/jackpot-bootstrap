@@ -1,0 +1,93 @@
+image: node:18-buster
+
+variables:
+  DOCKER_REGISTRY: registry.gitlab.com/jackpot
+  KUBE_NAMESPACE: jackpot
+
+stages:
+  - setup
+  - test
+  - build
+  - deploy
+
+# Install Bun and dependencies
+setup:
+  stage: setup
+  script:
+    - curl -fsSL https://bun.sh/install | bash
+    - export BUN_INSTALL=~/.bun
+    - export PATH=$BUN_INSTALL/bin:$PATH
+    - bun install
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+      - apps/*/node_modules/
+  artifacts:
+    paths:
+      - node_modules/
+      - apps/*/node_modules/
+
+# Run tests for all services
+test:
+  stage: test
+  needs: [setup]
+  script:
+    - export BUN_INSTALL=~/.bun
+    - export PATH=$BUN_INSTALL/bin:$PATH
+    - bun run test
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+
+# Build and push Docker images for each service
+.build_template: &build_definition
+  stage: build
+  needs: [test]
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+build_engine:
+  <<: *build_definition
+  script:
+    - docker build -f apps/engine/Dockerfile -t $DOCKER_REGISTRY/engine:$CI_COMMIT_SHA .
+    - docker push $DOCKER_REGISTRY/engine:$CI_COMMIT_SHA
+  rules:
+    - changes:
+      - apps/engine/**/*
+      - protos/**/*
+      when: always
+
+build_gateway:
+  <<: *build_definition
+  script:
+    - docker build -f apps/gateway/Dockerfile -t $DOCKER_REGISTRY/gateway:$CI_COMMIT_SHA .
+    - docker push $DOCKER_REGISTRY/gateway:$CI_COMMIT_SHA
+  rules:
+    - changes:
+      - apps/gateway/**/*
+      - protos/**/*
+      when: always
+
+# Deploy to Kubernetes
+deploy:
+  stage: deploy
+  image: 
+    name: bitnami/kubectl:latest
+    entrypoint: ['']
+  script:
+    # Update Kubernetes manifests with new image tags
+    - |
+      if [[ -n $(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep "apps/engine/") ]]; then
+        kubectl set image deployment/engine-deployment engine=$DOCKER_REGISTRY/engine:$CI_COMMIT_SHA -n $KUBE_NAMESPACE
+      fi
+    - |
+      if [[ -n $(git diff --name-only $CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA | grep "apps/gateway/") ]]; then
+        kubectl set image deployment/gateway-deployment gateway=$DOCKER_REGISTRY/gateway:$CI_COMMIT_SHA -n $KUBE_NAMESPACE
+      fi
+    # Apply any configuration changes
+    - kubectl apply -f infra/k8s/ -n $KUBE_NAMESPACE
+  environment:
+    name: production
+    url: https://api.jackpot.local
+  only:
+    - main
+  when: manual
