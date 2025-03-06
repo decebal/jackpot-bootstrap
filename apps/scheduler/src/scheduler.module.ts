@@ -5,6 +5,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices'
 import { SchedulerController } from './scheduler.controller'
 import { SchedulerService } from './scheduler.service'
 import { SchedulerDomainModule } from './domain/scheduler-domain.module'
+import { SchedulerInfrastructureModule } from './infrastructure/scheduler-infrastructure.module'
 import { HealthModule } from './health/health.module'
 import { join } from 'path'
 
@@ -42,7 +43,7 @@ import { join } from 'path'
 					transport: Transport.GRPC,
 					options: {
 						package: 'metrics',
-						protoPath: join(__dirname, '../../protos/metrics.proto'),
+						protoPath: join(__dirname, '../../../protos/metrics.proto'),
 						url: `${configService.get('METRICS_HOST', 'localhost')}:${configService.get('METRICS_PORT', 5002)}`,
 					},
 				}),
@@ -52,10 +53,14 @@ import { join } from 'path'
 		// Domain modules
 		SchedulerDomainModule,
 		
+		// Infrastructure module
+		SchedulerInfrastructureModule,
+		
 		// Health module
 		HealthModule,
 	],
 	controllers: [SchedulerController],
 	providers: [SchedulerService],
+	exports: [],
 })
 export class SchedulerModule {}

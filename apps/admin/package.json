@@ -13,7 +13,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "validate:env": "bun run ../../scripts/validate-env.js admin"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.14",

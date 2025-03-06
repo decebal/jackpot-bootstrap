@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package metrics;
 
+import "common.proto";
+
 service MetricsService {
   rpc CollectMetrics (CollectMetricsRequest) returns (CollectMetricsResponse) {}
   rpc GetMetrics (GetMetricsRequest) returns (GetMetricsResponse) {}
@@ -19,15 +21,18 @@ message CollectMetricsResponse {
   bool success = 1;
   string message = 2;
   string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
 }
 
 message GetMetricsRequest {
   string source = 1;
   string event_type = 2;
-  string start_date = 3;
-  string end_date = 4;
+  common.DateRange date_range = 3;
   int32 limit = 5;
   int32 offset = 6;
+  // Alternative using common message
+  // common.FilterOptions filter_options = 7;
 }
 
 message GetMetricsResponse {
@@ -35,6 +40,7 @@ message GetMetricsResponse {
   repeated MetricData metrics = 2;
   int32 total_count = 3;
   string error = 4;
+  common.PaginationInfo pagination = 5;
 }
 
 message MetricData {
@@ -47,9 +53,9 @@ message MetricData {
 
 message GenerateReportRequest {
   string report_type = 1;
-  string start_date = 2;
-  string end_date = 3;
-  string format = 4; // e.g., "json", "csv"
+  common.DateRange date_range = 2;
+  string format = 3; // e.g., "json", "csv"
+  map<string, string> parameters = 4;
 }
 
 message GenerateReportResponse {
@@ -57,4 +63,5 @@ message GenerateReportResponse {
   string report_id = 2;
   bytes report_data = 3;
   string error = 4;
+  common.FileInfo file_info = 5;
 }

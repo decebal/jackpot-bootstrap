@@ -1,0 +1,248 @@
+syntax = "proto3";
+
+package gateway;
+
+import "common.proto";
+
+service GatewayService {
+  // API Gateway operations
+  rpc RegisterService (RegisterServiceRequest) returns (RegisterServiceResponse) {}
+  rpc UnregisterService (UnregisterServiceRequest) returns (UnregisterServiceResponse) {}
+  rpc GetServiceEndpoints (GetServiceEndpointsRequest) returns (GetServiceEndpointsResponse) {}
+  
+  // Route management
+  rpc CreateRoute (CreateRouteRequest) returns (RouteResponse) {}
+  rpc UpdateRoute (UpdateRouteRequest) returns (RouteResponse) {}
+  rpc DeleteRoute (DeleteRouteRequest) returns (DeleteRouteResponse) {}
+  rpc ListRoutes (ListRoutesRequest) returns (ListRoutesResponse) {}
+  
+  // Authentication and Authorization
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse) {}
+  rpc CheckPermission (CheckPermissionRequest) returns (CheckPermissionResponse) {}
+  
+  // Rate limiting
+  rpc GetRateLimitConfig (GetRateLimitConfigRequest) returns (RateLimitConfigResponse) {}
+  rpc UpdateRateLimitConfig (UpdateRateLimitConfigRequest) returns (RateLimitConfigResponse) {}
+  
+  // Gateway status
+  rpc GetGatewayStatus (GetGatewayStatusRequest) returns (GatewayStatusResponse) {}
+}
+
+// Service registration messages
+message RegisterServiceRequest {
+  string service_name = 1;
+  string service_version = 2;
+  string host = 3;
+  int32 port = 4;
+  string protocol = 5; // "http", "grpc"
+  repeated Endpoint endpoints = 6;
+  map<string, string> metadata = 7;
+}
+
+message Endpoint {
+  string path = 1;
+  string method = 2; // "GET", "POST", "PUT", "DELETE", "PATCH", "ANY"
+  string handler = 3;
+  repeated string required_permissions = 4;
+  bool public = 5;
+  bool rate_limited = 6;
+  int32 rate_limit = 7;
+  string rate_limit_period = 8; // "second", "minute", "hour", "day"
+}
+
+message RegisterServiceResponse {
+  bool success = 1;
+  string service_id = 2;
+  string message = 3;
+  string error = 4;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+message UnregisterServiceRequest {
+  string service_id = 1;
+}
+
+message UnregisterServiceResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+message GetServiceEndpointsRequest {
+  string service_name = 1;
+}
+
+message GetServiceEndpointsResponse {
+  bool success = 1;
+  repeated Endpoint endpoints = 2;
+  string error = 3;
+}
+
+// Route management messages
+message CreateRouteRequest {
+  string path = 1;
+  string method = 2;
+  string target_service = 3;
+  string target_endpoint = 4;
+  repeated string required_permissions = 5;
+  bool public = 6;
+  bool rate_limited = 7;
+  int32 rate_limit = 8;
+  string rate_limit_period = 9;
+  map<string, string> transforms = 10;
+}
+
+message UpdateRouteRequest {
+  string id = 1;
+  optional string path = 2;
+  optional string method = 3;
+  optional string target_service = 4;
+  optional string target_endpoint = 5;
+  repeated string required_permissions = 6;
+  optional bool public = 7;
+  optional bool rate_limited = 8;
+  optional int32 rate_limit = 9;
+  optional string rate_limit_period = 10;
+  map<string, string> transforms = 11;
+}
+
+message DeleteRouteRequest {
+  string id = 1;
+}
+
+message DeleteRouteResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+message RouteResponse {
+  bool success = 1;
+  Route route = 2;
+  string error = 3;
+}
+
+message Route {
+  string id = 1;
+  string path = 2;
+  string method = 3;
+  string target_service = 4;
+  string target_endpoint = 5;
+  repeated string required_permissions = 6;
+  bool public = 7;
+  bool rate_limited = 8;
+  int32 rate_limit = 9;
+  string rate_limit_period = 10;
+  map<string, string> transforms = 11;
+  string created_at = 12;
+  string updated_at = 13;
+}
+
+message ListRoutesRequest {
+  string service_name = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+  // Alternative using common message
+  // common.FilterOptions filter_options = 4;
+}
+
+message ListRoutesResponse {
+  bool success = 1;
+  repeated Route routes = 2;
+  int32 total_count = 3;
+  string error = 4;
+  common.PaginationInfo pagination = 5;
+}
+
+// Authentication and Authorization messages
+message ValidateTokenRequest {
+  string token = 1;
+}
+
+message ValidateTokenResponse {
+  bool valid = 1;
+  string user_id = 2;
+  repeated string roles = 3;
+  repeated string permissions = 4;
+  int64 expires_at = 5;
+  string error = 6;
+}
+
+message CheckPermissionRequest {
+  string user_id = 1;
+  string permission = 2;
+}
+
+message CheckPermissionResponse {
+  bool has_permission = 1;
+  string error = 2;
+}
+
+// Rate limiting messages
+message GetRateLimitConfigRequest {
+  string service_name = 1;
+  string path = 2;
+}
+
+message UpdateRateLimitConfigRequest {
+  string service_name = 1;
+  string path = 2;
+  bool enabled = 3;
+  int32 limit = 4;
+  string period = 5; // "second", "minute", "hour", "day"
+}
+
+message RateLimitConfigResponse {
+  bool success = 1;
+  RateLimitConfig config = 2;
+  string error = 3;
+}
+
+message RateLimitConfig {
+  string service_name = 1;
+  string path = 2;
+  bool enabled = 3;
+  int32 limit = 4;
+  string period = 5;
+}
+
+// Gateway status messages
+message GetGatewayStatusRequest {
+  // Using common health check
+  common.HealthCheckRequest health_check = 1;
+}
+
+message GatewayStatusResponse {
+  bool success = 1;
+  GatewayStatus status = 2;
+  string error = 3;
+}
+
+message GatewayStatus {
+  string version = 1;
+  int32 uptime = 2;
+  int32 registered_services_count = 3;
+  int32 active_routes_count = 4;
+  int32 requests_per_second = 5;
+  int32 average_response_time = 6;
+  int32 error_rate = 7;
+  map<string, ServiceInfo> services = 8;
+  common.VersionInfo version_info = 9;
+  common.ResourceUtilization resources = 10;
+}
+
+message ServiceInfo {
+  string id = 1;
+  string name = 2;
+  string version = 3;
+  string status = 4; // "up", "down", "degraded"
+  string host = 5;
+  int32 port = 6;
+  int32 endpoints_count = 7;
+  string last_heartbeat = 8;
+}

@@ -1,0 +1,245 @@
+syntax = "proto3";
+
+package scheduler;
+
+import "common.proto";
+
+service SchedulerService {
+  // Job management
+  rpc CreateJob (CreateJobRequest) returns (JobResponse) {}
+  rpc GetJob (GetJobRequest) returns (JobResponse) {}
+  rpc UpdateJob (UpdateJobRequest) returns (JobResponse) {}
+  rpc DeleteJob (DeleteJobRequest) returns (DeleteJobResponse) {}
+  rpc ListJobs (ListJobsRequest) returns (ListJobsResponse) {}
+  
+  // Job execution
+  rpc ExecuteJob (ExecuteJobRequest) returns (ExecuteJobResponse) {}
+  rpc PauseJob (PauseJobRequest) returns (PauseJobResponse) {}
+  rpc ResumeJob (ResumeJobRequest) returns (ResumeJobResponse) {}
+  
+  // Schedule management
+  rpc CreateSchedule (CreateScheduleRequest) returns (ScheduleResponse) {}
+  rpc GetSchedule (GetScheduleRequest) returns (ScheduleResponse) {}
+  rpc UpdateSchedule (UpdateScheduleRequest) returns (ScheduleResponse) {}
+  rpc DeleteSchedule (DeleteScheduleRequest) returns (DeleteScheduleResponse) {}
+  rpc ListSchedules (ListSchedulesRequest) returns (ListSchedulesResponse) {}
+  
+  // System operations
+  rpc GetSchedulerStatus (GetSchedulerStatusRequest) returns (SchedulerStatusResponse) {}
+}
+
+// Job related messages
+message CreateJobRequest {
+  string type = 1;
+  string name = 2;
+  string description = 3;
+  bytes payload = 4;
+  string schedule = 5; // cron expression or ISO date string
+  int32 max_retries = 6;
+  int32 timeout = 7; // in seconds
+  map<string, string> metadata = 8;
+}
+
+message GetJobRequest {
+  string id = 1;
+}
+
+message UpdateJobRequest {
+  string id = 1;
+  optional string type = 2;
+  optional string name = 3;
+  optional string description = 4;
+  optional bytes payload = 5;
+  optional string schedule = 6;
+  optional int32 max_retries = 7;
+  optional int32 timeout = 8;
+  optional string status = 9;
+  map<string, string> metadata = 10;
+}
+
+message DeleteJobRequest {
+  string id = 1;
+}
+
+message DeleteJobResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+message JobResponse {
+  bool success = 1;
+  Job job = 2;
+  string error = 3;
+}
+
+message Job {
+  string id = 1;
+  string type = 2;
+  string name = 3;
+  string description = 4;
+  bytes payload = 5;
+  string schedule = 6;
+  int32 max_retries = 7;
+  int32 retries = 8;
+  int32 timeout = 9;
+  string status = 10; // "pending", "active", "completed", "failed", "paused"
+  string error = 11;
+  string last_executed_at = 12;
+  string next_execution_at = 13;
+  map<string, string> metadata = 14;
+  string created_at = 15;
+  string updated_at = 16;
+  common.AuditInfo audit_info = 17;
+  common.ErrorDetails error_details = 18;
+}
+
+message ListJobsRequest {
+  string status = 1;
+  string type = 2;
+  common.DateRange date_range = 3;
+  int32 limit = 5;
+  int32 offset = 6;
+  // Alternative using common message
+  // common.FilterOptions filter_options = 7;
+}
+
+message ListJobsResponse {
+  bool success = 1;
+  repeated Job jobs = 2;
+  int32 total_count = 3;
+  string error = 4;
+  common.PaginationInfo pagination = 5;
+}
+
+// Job execution related messages
+message ExecuteJobRequest {
+  string id = 1;
+  bool force = 2;
+}
+
+message ExecuteJobResponse {
+  bool success = 1;
+  string execution_id = 2;
+  string status = 3;
+  string error = 4;
+}
+
+message PauseJobRequest {
+  string id = 1;
+}
+
+message PauseJobResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+message ResumeJobRequest {
+  string id = 1;
+}
+
+message ResumeJobResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+// Schedule related messages
+message CreateScheduleRequest {
+  string name = 1;
+  string description = 2;
+  string cron_expression = 3;
+  string timezone = 4;
+  bool active = 5;
+  map<string, string> metadata = 6;
+}
+
+message GetScheduleRequest {
+  string id = 1;
+}
+
+message UpdateScheduleRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  optional string cron_expression = 4;
+  optional string timezone = 5;
+  optional bool active = 6;
+  map<string, string> metadata = 7;
+}
+
+message DeleteScheduleRequest {
+  string id = 1;
+}
+
+message DeleteScheduleResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+message ScheduleResponse {
+  bool success = 1;
+  Schedule schedule = 2;
+  string error = 3;
+}
+
+message Schedule {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string cron_expression = 4;
+  string timezone = 5;
+  bool active = 6;
+  string next_run_at = 7;
+  string last_run_at = 8;
+  map<string, string> metadata = 9;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+message ListSchedulesRequest {
+  bool active_only = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message ListSchedulesResponse {
+  bool success = 1;
+  repeated Schedule schedules = 2;
+  int32 total_count = 3;
+  string error = 4;
+  common.PaginationInfo pagination = 5;
+}
+
+// System status related messages
+message GetSchedulerStatusRequest {
+  // Using common health check
+  common.HealthCheckRequest health_check = 1;
+}
+
+message SchedulerStatusResponse {
+  bool success = 1;
+  SchedulerStatus status = 2;
+  string error = 3;
+}
+
+message SchedulerStatus {
+  string version = 1;
+  int32 active_jobs_count = 2;
+  int32 pending_jobs_count = 3;
+  int32 failed_jobs_count = 4;
+  int32 completed_jobs_count = 5;
+  int32 active_schedules_count = 6;
+  string uptime = 7;
+  map<string, string> metrics = 8;
+}

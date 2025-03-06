@@ -1,0 +1,265 @@
+syntax = "proto3";
+
+package admin;
+
+import "common.proto";
+
+service AdminService {
+  // User management
+  rpc CreateUser (CreateUserRequest) returns (UserResponse) {}
+  rpc GetUser (GetUserRequest) returns (UserResponse) {}
+  rpc UpdateUser (UpdateUserRequest) returns (UserResponse) {}
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {}
+  rpc ListUsers (ListUsersRequest) returns (ListUsersResponse) {}
+  
+  // Authentication
+  rpc Login (LoginRequest) returns (LoginResponse) {}
+  rpc RefreshToken (RefreshTokenRequest) returns (LoginResponse) {}
+  rpc Logout (LogoutRequest) returns (LogoutResponse) {}
+  
+  // Role management
+  rpc CreateRole (CreateRoleRequest) returns (RoleResponse) {}
+  rpc GetRole (GetRoleRequest) returns (RoleResponse) {}
+  rpc UpdateRole (UpdateRoleRequest) returns (RoleResponse) {}
+  rpc DeleteRole (DeleteRoleRequest) returns (DeleteRoleResponse) {}
+  rpc ListRoles (ListRolesRequest) returns (ListRolesResponse) {}
+  
+  // Permission management
+  rpc AssignPermission (AssignPermissionRequest) returns (PermissionResponse) {}
+  rpc RevokePermission (RevokePermissionRequest) returns (PermissionResponse) {}
+  rpc ListPermissions (ListPermissionsRequest) returns (ListPermissionsResponse) {}
+  
+  // System status
+  rpc GetSystemStatus (GetSystemStatusRequest) returns (SystemStatusResponse) {}
+  rpc GetServiceHealth (GetServiceHealthRequest) returns (ServiceHealthResponse) {}
+}
+
+// User related messages
+message CreateUserRequest {
+  string email = 1;
+  string password = 2;
+  string first_name = 3;
+  string last_name = 4;
+  repeated string roles = 5;
+  map<string, string> metadata = 6;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  optional string email = 2;
+  optional string password = 3;
+  optional string first_name = 4;
+  optional string last_name = 5;
+  repeated string roles = 6;
+  map<string, string> metadata = 7;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message DeleteUserResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+message UserResponse {
+  bool success = 1;
+  User user = 2;
+  string error = 3;
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  string first_name = 3;
+  string last_name = 4;
+  repeated string roles = 5;
+  map<string, string> metadata = 6;
+  string created_at = 7;
+  string updated_at = 8;
+  common.AuditInfo audit_info = 9;
+  common.ContactInfo contact_info = 10;
+}
+
+message ListUsersRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+  string search = 3;
+  string sort_by = 4;
+  string sort_order = 5;
+  // Alternative using common message
+  // common.FilterOptions filter_options = 1;
+}
+
+message ListUsersResponse {
+  bool success = 1;
+  repeated User users = 2;
+  int32 total_count = 3;
+  string error = 4;
+  common.PaginationInfo pagination = 5;
+}
+
+// Authentication related messages
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  bool success = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+  User user = 4;
+  int32 expires_in = 5;
+  string error = 6;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message LogoutRequest {
+  string access_token = 1;
+}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+// Role related messages
+message CreateRoleRequest {
+  string name = 1;
+  string description = 2;
+  repeated string permissions = 3;
+}
+
+message GetRoleRequest {
+  string id = 1;
+}
+
+message UpdateRoleRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  repeated string permissions = 4;
+}
+
+message DeleteRoleRequest {
+  string id = 1;
+}
+
+message DeleteRoleResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+message RoleResponse {
+  bool success = 1;
+  Role role = 2;
+  string error = 3;
+}
+
+message Role {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated string permissions = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+message ListRolesRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+  string search = 3;
+}
+
+message ListRolesResponse {
+  bool success = 1;
+  repeated Role roles = 2;
+  int32 total_count = 3;
+  string error = 4;
+  common.PaginationInfo pagination = 5;
+}
+
+// Permission related messages
+message AssignPermissionRequest {
+  string role_id = 1;
+  string permission = 2;
+}
+
+message RevokePermissionRequest {
+  string role_id = 1;
+  string permission = 2;
+}
+
+message PermissionResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+  // Alternative using common message
+  // common.StandardResponse response = 1;
+}
+
+message ListPermissionsRequest {
+  string role_id = 1;
+}
+
+message ListPermissionsResponse {
+  bool success = 1;
+  repeated string permissions = 2;
+  string error = 3;
+}
+
+// System status related messages
+message GetSystemStatusRequest {
+  // Using common health check
+  common.HealthCheckRequest health_check = 1;
+}
+
+message SystemStatusResponse {
+  bool success = 1;
+  SystemStatus status = 2;
+  string error = 3;
+}
+
+message SystemStatus {
+  string version = 1;
+  string environment = 2;
+  int32 uptime = 3;
+  map<string, ServiceStatus> services = 4;
+  common.VersionInfo version_info = 5;
+}
+
+message GetServiceHealthRequest {
+  string service_name = 1;
+}
+
+message ServiceHealthResponse {
+  bool success = 1;
+  ServiceStatus status = 2;
+  string error = 3;
+}
+
+message ServiceStatus {
+  string name = 1;
+  string status = 2; // "up", "down", "degraded"
+  string version = 3;
+  int32 uptime = 4;
+  map<string, string> details = 5;
+}

@@ -13,6 +13,7 @@ const axios_1 = require("@nestjs/axios");
 const health_controller_1 = require("./health.controller");
 const health_service_1 = require("./health.service");
 const typeorm_1 = require("@nestjs/typeorm");
+const redis_module_1 = require("../infrastructure/redis/redis.module");
 let HealthModule = class HealthModule {
 };
 exports.HealthModule = HealthModule;
@@ -21,7 +22,8 @@ exports.HealthModule = HealthModule = __decorate([
         imports: [
             terminus_1.TerminusModule,
             axios_1.HttpModule,
-            typeorm_1.TypeOrmModule
+            typeorm_1.TypeOrmModule,
+            redis_module_1.RedisModule
         ],
         controllers: [health_controller_1.HealthController],
         providers: [health_service_1.HealthService],

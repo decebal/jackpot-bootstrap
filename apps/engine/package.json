@@ -12,7 +12,9 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "clean": "rm -rf dist",
+    "validate:env": "bun run ../../scripts/validate-env.js engine"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.14",

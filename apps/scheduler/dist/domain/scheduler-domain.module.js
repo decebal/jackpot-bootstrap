@@ -12,12 +12,13 @@ const job_processor_1 = require("./job.processor");
 const job_validator_1 = require("./job.validator");
 const job_scheduler_1 = require("./job.scheduler");
 const scheduler_infrastructure_module_1 = require("../infrastructure/scheduler-infrastructure.module");
+const grpc_module_1 = require("../infrastructure/grpc/grpc.module");
 let SchedulerDomainModule = class SchedulerDomainModule {
 };
 exports.SchedulerDomainModule = SchedulerDomainModule;
 exports.SchedulerDomainModule = SchedulerDomainModule = __decorate([
     (0, common_1.Module)({
-        imports: [scheduler_infrastructure_module_1.SchedulerInfrastructureModule],
+        imports: [scheduler_infrastructure_module_1.SchedulerInfrastructureModule, grpc_module_1.GrpcModule],
         providers: [job_processor_1.JobProcessor, job_validator_1.JobValidator, job_scheduler_1.JobScheduler],
         exports: [job_processor_1.JobProcessor, job_validator_1.JobValidator, job_scheduler_1.JobScheduler],
     })

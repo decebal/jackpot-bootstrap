@@ -42,7 +42,7 @@ import { join } from 'path'
 					transport: Transport.GRPC,
 					options: {
 						package: 'metrics',
-						protoPath: join(__dirname, '../../protos/metrics.proto'),
+						protoPath: join(__dirname, '../../../protos/metrics.proto'),
 						url: `${configService.get('METRICS_HOST', 'localhost')}:${configService.get('METRICS_PORT', 5002)}`,
 					},
 				}),
@@ -55,7 +55,7 @@ import { join } from 'path'
 					transport: Transport.GRPC,
 					options: {
 						package: 'scheduler',
-						protoPath: join(__dirname, '../../protos/scheduler.proto'),
+						protoPath: join(__dirname, '../../../protos/scheduler.proto'),
 						url: `${configService.get('SCHEDULER_HOST', 'localhost')}:${configService.get('SCHEDULER_PORT', 5003)}`,
 					},
 				}),

@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package common;
+
+// Common response structure for simple operations
+message StandardResponse {
+  bool success = 1;
+  string message = 2;
+  string error = 3;
+}
+
+// Pagination information
+message PaginationInfo {
+  int32 total_items = 1;
+  int32 total_pages = 2;
+  int32 current_page = 3;
+  int32 page_size = 4;
+  bool has_next_page = 5;
+  bool has_previous_page = 6;
+}
+
+// Common timestamp format
+message Timestamp {
+  int64 seconds = 1;
+  int32 nanos = 2;
+}
+
+// Health check related messages
+message HealthCheckRequest {
+  string service = 1;
+}
+
+message HealthCheckResponse {
+  enum ServingStatus {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+    SERVICE_UNKNOWN = 3;
+  }
+  ServingStatus status = 1;
+}
+
+// Error details
+message ErrorDetails {
+  string code = 1;
+  string message = 2;
+  string target = 3;
+  repeated ErrorDetails details = 4;
+  map<string, string> metadata = 5;
+}
+
+// Audit information
+message AuditInfo {
+  string created_by = 1;
+  string created_at = 2;
+  string updated_by = 3;
+  string updated_at = 4;
+}
+
+// Versioning information
+message VersionInfo {
+  string version = 1;
+  string build_date = 2;
+  string commit_hash = 3;
+  string environment = 4;
+}
+
+// Resource limits
+message ResourceLimits {
+  int32 cpu = 1;
+  int32 memory = 2;
+  int32 storage = 3;
+  int32 bandwidth = 4;
+}
+
+// Metadata for requests and responses
+message MetadataEntry {
+  string key = 1;
+  string value = 2;
+}
+
+// Common filter options
+message FilterOptions {
+  string search_term = 1;
+  string sort_by = 2;
+  string sort_direction = 3; // "asc" or "desc"
+  int32 limit = 4;
+  int32 offset = 5;
+  map<string, string> filters = 6;
+}
+
+// Date range for queries
+message DateRange {
+  string start_date = 1;
+  string end_date = 2;
+}
+
+// Geographic location
+message GeoLocation {
+  double latitude = 1;
+  double longitude = 2;
+  string address = 3;
+  string city = 4;
+  string state = 5;
+  string country = 6;
+  string postal_code = 7;
+}
+
+// Contact information
+message ContactInfo {
+  string email = 1;
+  string phone = 2;
+  string alternative_phone = 3;
+  string website = 4;
+}
+
+// Money representation
+message Money {
+  string currency_code = 1; // ISO 4217 currency code
+  int64 units = 2; // Whole units of the currency
+  int32 nanos = 3; // Fractional units, must be in range -999,999,999 to +999,999,999
+}
+
+// File information
+message FileInfo {
+  string id = 1;
+  string name = 2;
+  string mime_type = 3;
+  int64 size = 4; // Size in bytes
+  string url = 5;
+  string created_at = 6;
+  map<string, string> metadata = 7;
+}
+
+// Batch operation result
+message BatchResult {
+  int32 total = 1;
+  int32 successful = 2;
+  int32 failed = 3;
+  repeated string failed_ids = 4;
+  repeated ErrorDetails errors = 5;
+}

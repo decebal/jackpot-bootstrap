@@ -14,6 +14,7 @@ const microservices_1 = require("@nestjs/microservices");
 const scheduler_controller_1 = require("./scheduler.controller");
 const scheduler_service_1 = require("./scheduler.service");
 const scheduler_domain_module_1 = require("./domain/scheduler-domain.module");
+const scheduler_infrastructure_module_1 = require("./infrastructure/scheduler-infrastructure.module");
 const health_module_1 = require("./health/health.module");
 const path_1 = require("path");
 let SchedulerModule = class SchedulerModule {
@@ -49,17 +50,19 @@ exports.SchedulerModule = SchedulerModule = __decorate([
                         transport: microservices_1.Transport.GRPC,
                         options: {
                             package: 'metrics',
-                            protoPath: (0, path_1.join)(__dirname, '../../protos/metrics.proto'),
+                            protoPath: (0, path_1.join)(__dirname, '../../../protos/metrics.proto'),
                             url: `${configService.get('METRICS_HOST', 'localhost')}:${configService.get('METRICS_PORT', 5002)}`,
                         },
                     }),
                 },
             ]),
             scheduler_domain_module_1.SchedulerDomainModule,
+            scheduler_infrastructure_module_1.SchedulerInfrastructureModule,
             health_module_1.HealthModule,
         ],
         controllers: [scheduler_controller_1.SchedulerController],
         providers: [scheduler_service_1.SchedulerService],
+        exports: [],
     })
 ], SchedulerModule);
 //# sourceMappingURL=scheduler.module.js.map

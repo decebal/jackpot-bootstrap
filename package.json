@@ -11,7 +11,10 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "clean": "turbo run clean",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "validate:env": "turbo run validate:env",
+    "validate:env:root": "bun run scripts/validate-env.js root",
+    "setup:deps": "bun run scripts/setup-dependencies.js"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",

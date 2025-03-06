@@ -19,7 +19,7 @@ async function bootstrap() {
         transport: microservices_1.Transport.GRPC,
         options: {
             package: 'admin',
-            protoPath: (0, path_1.join)(__dirname, '../../protos/admin.proto'),
+            protoPath: (0, path_1.join)(__dirname, '../../../protos/admin.proto'),
             url: `0.0.0.0:${grpcPort}`,
         },
     });
