@@ -11,20 +11,34 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProcessRequestDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class ProcessRequestDto {
 }
 exports.ProcessRequestDto = ProcessRequestDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Unique identifier for the process request',
+        example: 'req-123456',
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], ProcessRequestDto.prototype, "id", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Data payload to be processed',
+        example: { key: 'value', nested: { property: 'value' } },
+    }),
     (0, class_validator_1.IsObject)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Object)
 ], ProcessRequestDto.prototype, "data", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Optional timestamp for the request',
+        example: '2025-03-07T13:15:43Z',
+        required: false,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)

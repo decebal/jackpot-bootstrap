@@ -229,10 +229,29 @@ jackpot-bootstrap-monorepo/
 
 ## 📚 API Documentation
 
-The API documentation is available through the Gateway service when running in development mode:
+### REST API Documentation
 
-- REST API: http://localhost:3000/api/docs
-- gRPC: Protocol Buffer definitions in the `protos` directory
+The REST API documentation is generated using Swagger/OpenAPI and is available through the Gateway service when running in development mode:
+
+```bash
+# Start the Gateway service
+bun run dev:scope @jackpot/gateway
+```
+
+Then access the Swagger UI at: http://localhost:3000/api/docs
+
+### Generating API Documentation
+
+The API documentation is automatically generated using NestJS Swagger. To ensure your endpoints are properly documented:
+
+1. Add `@ApiTags()` decorator to your controllers
+2. Add `@ApiOperation()` decorator to describe each endpoint
+3. Add `@ApiResponse()` decorators to document possible responses
+4. Use `@ApiProperty()` in your DTOs to document request/response properties
+
+### gRPC API Documentation
+
+For gRPC services, the API is defined in Protocol Buffer files located in the `protos` directory at the root of the monorepo.
 
 ## 🤝 Contributing
 

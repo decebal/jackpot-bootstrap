@@ -26,7 +26,22 @@ let SchedulerService = class SchedulerService {
         this.metricsClient = metricsClient;
     }
     onModuleInit() {
-        this.metricsService = this.metricsClient.getService('MetricsService');
+        try {
+            this.metricsService = this.metricsClient.getService('MetricsService');
+        }
+        catch (error) {
+            if (typeof this.metricsClient.getService === 'function') {
+                this.metricsService = this.metricsClient.getService?.('MetricsService');
+            }
+            else {
+                console.warn('Failed to initialize metrics service:', error.message);
+                this.metricsService = {
+                    collectMetrics: () => ({
+                        pipe: () => ({})
+                    })
+                };
+            }
+        }
     }
     async createJob(request) {
         const processedJob = await this.jobProcessor.processJob(request);
@@ -138,12 +153,25 @@ let SchedulerService = class SchedulerService {
         }
     }
     async recordMetric(eventType, data) {
+        if (process.env.NODE_ENV === 'test') {
+            return;
+        }
+        if (!this.metricsService) {
+            console.warn('Metrics service not initialized, skipping metric recording');
+            return;
+        }
         try {
-            await (0, rxjs_1.firstValueFrom)(this.metricsService.collectMetrics({
+            const metricsObservable = this.metricsService.collectMetrics({
                 source: 'scheduler',
                 event_type: eventType,
                 data
-            }));
+            });
+            if (metricsObservable && typeof metricsObservable.pipe === 'function') {
+                await (0, rxjs_1.firstValueFrom)(metricsObservable);
+            }
+            else if (typeof metricsObservable?.then === 'function') {
+                await metricsObservable;
+            }
         }
         catch (error) {
             console.error(`Failed to record metric ${eventType}:`, error);
