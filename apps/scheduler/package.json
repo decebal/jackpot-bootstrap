@@ -10,11 +10,17 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest --config=jest.config.js",
+    "test:watch": "jest --config=jest.config.js --watch",
+    "test:coverage": "jest --config=jest.config.js --coverage",
+    "test:unit": "jest --config=jest.config.js --testMatch='<rootDir>/test/unit/**/*.spec.ts'",
+    "test:integration": "jest --config=jest.config.js --testMatch='<rootDir>/test/integration/**/*.spec.ts'",
+    "test:e2e": "jest --config=jest.config.js --testMatch='<rootDir>/test/e2e/**/*.spec.ts'",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand --config=jest.config.js",
     "clean": "rm -rf dist",
-    "validate:env": "bun run ../../scripts/validate-env.js scheduler"
+    "validate:env": "bun run ../../scripts/validate-env.js scheduler",
+    "generate:proto": "bun run ../../scripts/generate-proto.js scheduler"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.14",
@@ -35,6 +41,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@jackpot/testing-utils": "*",
     "@nestjs/cli": "^10.3.2",
     "@nestjs/schematics": "^10.1.1",
     "@nestjs/testing": "^10.3.3",
@@ -53,22 +60,5 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   }
 }

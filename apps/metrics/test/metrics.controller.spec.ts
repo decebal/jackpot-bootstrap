@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { MetricsController } from '../src/metrics.controller'
 import { MetricsService } from '../src/metrics.service'
-import { CollectMetricsRequest, MetricData } from '../src/domain/interfaces/metrics.interface'
+import { CollectMetricsRequest, MetricData, GenerateReportRequest } from '../src/domain/interfaces/metrics.interface'
 
 // Mock dependencies
 jest.mock('../src/metrics.service')
@@ -48,7 +48,10 @@ describe('MetricsController', () => {
 			
 			// Assert
 			expect(metricsService.collectMetrics).toHaveBeenCalledWith(request)
-			expect(result).toEqual(expectedResult)
+			expect(result).toEqual({
+				success: true,
+				metric: expectedResult
+			})
 		})
 	})
 
@@ -91,7 +94,10 @@ describe('MetricsController', () => {
 				request.limit,
 				request.offset
 			)
-			expect(result).toEqual(expectedResult)
+			expect(result).toEqual({
+				success: true,
+				...expectedResult
+			})
 		})
 	})
 
@@ -115,7 +121,10 @@ describe('MetricsController', () => {
 			
 			// Assert
 			expect(metricsService.getMetricById).toHaveBeenCalledWith(request.id)
-			expect(result).toEqual(expectedMetric)
+			expect(result).toEqual({
+				success: true,
+				metric: expectedMetric
+			})
 		})
 		
 		it('should return empty object if metric not found', async () => {
@@ -128,14 +137,17 @@ describe('MetricsController', () => {
 			
 			// Assert
 			expect(metricsService.getMetricById).toHaveBeenCalledWith(request.id)
-			expect(result).toEqual({})
+			expect(result).toEqual({
+				success: true,
+				metric: null
+			})
 		})
 	})
 
 	describe('generateReport', () => {
 		it('should call service.generateReport with the request parameters', async () => {
 			// Arrange
-			const request = {
+			const request: GenerateReportRequest = {
 				report_type: 'summary',
 				start_date: '2023-01-01T00:00:00.000Z',
 				end_date: '2023-01-02T00:00:00.000Z',
@@ -162,7 +174,10 @@ describe('MetricsController', () => {
 				request.end_date,
 				request.format
 			)
-			expect(result).toEqual(expectedReport)
+			expect(result).toEqual({
+				success: true,
+				report: expectedReport
+			})
 		})
 	})
 })

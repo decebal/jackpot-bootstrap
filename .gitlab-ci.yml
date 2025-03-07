@@ -79,35 +79,95 @@ build-metrics:
     - tags
 
 # Test stage
-test-gateway:
+.test-template: &test-template
   stage: test
   image: oven/bun:1.0
   script:
     - bun install --frozen-lockfile
-    - bun run test:gateway
-  only:
-    - main
-    - merge_requests
+    - bun run test
+
+test-gateway:
+  <<: *test-template
+  script:
+    - bun install --frozen-lockfile
+    - cd apps/gateway && bun test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - apps/gateway/**/*
+        - packages/testing-utils/**/*
+        - protos/**/*
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 test-engine:
-  stage: test
-  image: oven/bun:1.0
+  <<: *test-template
   script:
     - bun install --frozen-lockfile
-    - bun run test:engine
-  only:
-    - main
-    - merge_requests
+    - cd apps/engine && bun test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - apps/engine/**/*
+        - packages/testing-utils/**/*
+        - protos/**/*
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 test-metrics:
-  stage: test
-  image: oven/bun:1.0
+  <<: *test-template
   script:
     - bun install --frozen-lockfile
-    - bun run test:metrics
-  only:
-    - main
-    - merge_requests
+    - cd apps/metrics && bun test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - apps/metrics/**/*
+        - packages/testing-utils/**/*
+        - protos/**/*
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+test-scheduler:
+  <<: *test-template
+  script:
+    - bun install --frozen-lockfile
+    - cd apps/scheduler && bun test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - apps/scheduler/**/*
+        - packages/testing-utils/**/*
+        - protos/**/*
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+test-admin:
+  <<: *test-template
+  script:
+    - bun install --frozen-lockfile
+    - cd apps/admin && bun test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - apps/admin/**/*
+        - packages/testing-utils/**/*
+        - protos/**/*
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+test-integration:
+  <<: *test-template
+  services:
+    - name: redis:alpine
+      alias: redis
+  variables:
+    REDIS_HOST: redis
+  script:
+    - bun install --frozen-lockfile
+    - bun run test:integration
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - apps/**/*
+        - packages/testing-utils/**/*
+        - protos/**/*
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 # Deploy stage
 deploy-dev:

@@ -25,8 +25,29 @@
       "dependsOn": ["validate:env"],
       "outputs": []
     },
+    "test:watch": {
+      "dependsOn": ["validate:env"],
+      "outputs": [],
+      "cache": false,
+      "persistent": true
+    },
+    "test:coverage": {
+      "dependsOn": ["validate:env"],
+      "outputs": ["coverage/**"]
+    },
+    "test:integration": {
+      "dependsOn": ["validate:env", "build"],
+      "outputs": []
+    },
+    "test:e2e": {
+      "dependsOn": ["validate:env", "build"],
+      "outputs": []
+    },
     "clean": {
       "cache": false
+    },
+    "generate:proto": {
+      "outputs": ["src/proto/**"]
     }
   }
 }

@@ -6,10 +6,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RedisModule = void 0;
+exports.RedisModule = exports.REDIS_CLIENT = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const redis_service_1 = require("./redis.service");
+exports.REDIS_CLIENT = 'REDIS_CLIENT';
 let RedisModule = class RedisModule {
 };
 exports.RedisModule = RedisModule;
@@ -18,7 +19,7 @@ exports.RedisModule = RedisModule = __decorate([
         imports: [config_1.ConfigModule],
         providers: [
             {
-                provide: 'REDIS_CLIENT',
+                provide: exports.REDIS_CLIENT,
                 useFactory: (configService) => {
                     const host = configService.get('REDIS_HOST', 'localhost');
                     const port = configService.get('REDIS_PORT', 6379);

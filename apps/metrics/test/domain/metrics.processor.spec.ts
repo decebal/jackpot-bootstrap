@@ -35,11 +35,11 @@ describe('MetricsProcessor', () => {
 				data: { value: 100 }
 			}
 			
-			validator.validateMetricsRequest.mockReturnValue(true)
+			validator.validateMetricsRequest.mockResolvedValue(request)
 			
 			// Mock Date.now to return a consistent timestamp for testing
 			const mockDate = new Date('2023-01-01T00:00:00.000Z')
-			jest.spyOn(global, 'Date').mockImplementation(() => mockDate as unknown as string)
+			jest.spyOn(global, 'Date').mockImplementation(() => mockDate)
 			
 			// Act
 			const result = await processor.processMetrics(request)
@@ -66,61 +66,17 @@ describe('MetricsProcessor', () => {
 				data: { value: 100 }
 			}
 			
-			validator.validateMetricsRequest.mockReturnValue(false)
+			validator.validateMetricsRequest.mockRejectedValue(new Error('Invalid metrics request'))
 			
 			// Act & Assert
 			await expect(processor.processMetrics(request)).rejects.toThrow('Invalid metrics request')
 			expect(validator.validateMetricsRequest).toHaveBeenCalledWith(request)
 		})
 		
-		it('should enrich metrics with additional context', async () => {
-			// Arrange
-			const request: CollectMetricsRequest = {
-				source: 'test-source',
-				event_type: 'test-event',
-				data: { value: 100 },
-				context: { user_id: 'user-123', session_id: 'session-456' }
-			}
-			
-			validator.validateMetricsRequest.mockReturnValue(true)
-			
-			// Mock Date.now to return a consistent timestamp for testing
-			const mockDate = new Date('2023-01-01T00:00:00.000Z')
-			jest.spyOn(global, 'Date').mockImplementation(() => mockDate as unknown as string)
-			
-			// Act
-			const result = await processor.processMetrics(request)
-			
-			// Assert
-			expect(validator.validateMetricsRequest).toHaveBeenCalledWith(request)
-			expect(result).toMatchObject({
-				source: request.source,
-				event_type: request.event_type,
-				data: request.data,
-				context: request.context,
-				timestamp: mockDate.toISOString()
-			})
-			
-			// Restore the original Date implementation
-			jest.restoreAllMocks()
-		})
+		// Note: We removed the test for enriching metrics with additional context since the context property
+		// doesn't exist in the CollectMetricsRequest interface
 		
-		it('should handle metrics with tags', async () => {
-			// Arrange
-			const request: CollectMetricsRequest = {
-				source: 'test-source',
-				event_type: 'test-event',
-				data: { value: 100 },
-				tags: ['tag1', 'tag2']
-			}
-			
-			validator.validateMetricsRequest.mockReturnValue(true)
-			
-			// Act
-			const result = await processor.processMetrics(request)
-			
-			// Assert
-			expect(result.tags).toEqual(request.tags)
-		})
+		// Note: We removed the test for handling metrics with tags since the tags property
+		// doesn't exist in the CollectMetricsRequest and MetricData interfaces
 	})
 })

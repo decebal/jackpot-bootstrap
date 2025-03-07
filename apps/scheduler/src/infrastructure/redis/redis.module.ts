@@ -2,11 +2,13 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { RedisService } from './redis.service'
 
+export const REDIS_CLIENT = 'REDIS_CLIENT'
+
 @Module({
 	imports: [ConfigModule],
 	providers: [
 		{
-			provide: 'REDIS_CLIENT',
+			provide: REDIS_CLIENT,
 			useFactory: (configService: ConfigService) => {
 				const host = configService.get('REDIS_HOST', 'localhost')
 				const port = configService.get('REDIS_PORT', 6379)
