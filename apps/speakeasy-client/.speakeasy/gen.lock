@@ -1,0 +1,117 @@
+lockVersion: 2.0.0
+id: 8c7fa22f-852e-4f65-a68c-d4cdc72b0e63
+management:
+  docChecksum: 0b69bfcd523668f556eea9437950a99b
+  docVersion: "1.0"
+  speakeasyVersion: 1.487.1
+  generationVersion: 2.506.0
+  releaseVersion: 0.2.0
+  configChecksum: 2de6368ed488d287cfc0c72b16b0b9af
+features:
+  typescript:
+    additionalDependencies: 0.1.0
+    core: 3.19.0
+    defaultEnabledRetries: 0.1.0
+    enumUnions: 0.1.0
+    envVarSecurityUsage: 0.1.2
+    flattening: 2.82.1
+    globalSecurityCallbacks: 0.1.0
+    globalServerURLs: 2.82.4
+    responseFormat: 0.2.3
+    retries: 2.83.0
+    sdkHooks: 0.2.0
+generatedFiles:
+  - .gitattributes
+  - .npmignore
+  - FUNCTIONS.md
+  - RUNTIMES.md
+  - USAGE.md
+  - docs/lib/utils/retryconfig.md
+  - docs/models/operations/gatewaycontrollergetenginestatusrequest.md
+  - docs/models/operations/gatewaycontrollergetenginestatusresponse.md
+  - docs/models/operations/gatewaycontrollerhealthcheckresponse.md
+  - docs/models/operations/gatewaycontrollerprocessenginerequestresponse.md
+  - docs/models/shared/data.md
+  - docs/models/shared/engineprocessresponse.md
+  - docs/models/shared/enginestatusresponse.md
+  - docs/models/shared/enginestatusresponseresult.md
+  - docs/models/shared/healthcheckresponse.md
+  - docs/models/shared/processrequestdto.md
+  - docs/models/shared/result.md
+  - docs/models/shared/status.md
+  - docs/sdks/gateway/README.md
+  - docs/sdks/jackpotapi/README.md
+  - eslint.config.mjs
+  - jsr.json
+  - package.json
+  - src/core.ts
+  - src/funcs/gatewayGatewayControllerGetEngineStatus.ts
+  - src/funcs/gatewayGatewayControllerHealthCheck.ts
+  - src/funcs/gatewayGatewayControllerProcessEngineRequest.ts
+  - src/hooks/hooks.ts
+  - src/hooks/index.ts
+  - src/hooks/types.ts
+  - src/index.ts
+  - src/lib/base64.ts
+  - src/lib/config.ts
+  - src/lib/dlv.ts
+  - src/lib/encodings.ts
+  - src/lib/files.ts
+  - src/lib/http.ts
+  - src/lib/is-plain-object.ts
+  - src/lib/logger.ts
+  - src/lib/matchers.ts
+  - src/lib/primitives.ts
+  - src/lib/retries.ts
+  - src/lib/schemas.ts
+  - src/lib/sdks.ts
+  - src/lib/security.ts
+  - src/lib/url.ts
+  - src/models/errors/apierror.ts
+  - src/models/errors/httpclienterrors.ts
+  - src/models/errors/index.ts
+  - src/models/errors/sdkvalidationerror.ts
+  - src/models/operations/gatewaycontrollergetenginestatus.ts
+  - src/models/operations/gatewaycontrollerhealthcheck.ts
+  - src/models/operations/gatewaycontrollerprocessenginerequest.ts
+  - src/models/operations/index.ts
+  - src/models/shared/engineprocessresponse.ts
+  - src/models/shared/enginestatusresponse.ts
+  - src/models/shared/healthcheckresponse.ts
+  - src/models/shared/index.ts
+  - src/models/shared/processrequestdto.ts
+  - src/sdk/gateway.ts
+  - src/sdk/index.ts
+  - src/sdk/sdk.ts
+  - src/types/blobs.ts
+  - src/types/constdatetime.ts
+  - src/types/enums.ts
+  - src/types/fp.ts
+  - src/types/index.ts
+  - src/types/operations.ts
+  - src/types/rfcdate.ts
+  - src/types/streams.ts
+  - tsconfig.json
+examples:
+  GatewayController_getEngineStatus:
+    speakeasy-default-gateway-controller-get-engine-status:
+      parameters:
+        path:
+          id: "req-123456"
+      responses:
+        "200":
+          application/json: {"error": "Failed to process request", "id": "req-123456", "status": "completed", "success": true}
+  GatewayController_healthCheck:
+    speakeasy-default-gateway-controller-health-check:
+      responses:
+        "200":
+          application/json: {"status": "ok", "timestamp": "2025-03-07T13:15:43Z"}
+  GatewayController_processEngineRequest:
+    speakeasy-default-gateway-controller-process-engine-request:
+      requestBody:
+        application/json: {"data": {}, "id": "req-123456", "timestamp": "2025-03-07T13:15:43Z"}
+      responses:
+        "200":
+          application/json: {"error": "Failed to process request", "id": "req-123456", "result": {}, "success": true}
+examplesVersion: 1.0.0
+generatedTests: {}
