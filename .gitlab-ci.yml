@@ -38,9 +38,9 @@ type-check:
 # Build stage
 build-gateway:
   stage: build
-  image: docker:20.10.16
+  image: docker:20.10.24
   services:
-    - docker:20.10.16-dind
+    - docker:20.10.24-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $DOCKER_REGISTRY
     - docker build -t $DOCKER_REGISTRY/jackpot/gateway:$CI_COMMIT_SHA -t $DOCKER_REGISTRY/jackpot/gateway:latest -f apps/gateway/Dockerfile .
@@ -52,9 +52,9 @@ build-gateway:
 
 build-engine:
   stage: build
-  image: docker:20.10.16
+  image: docker:20.10.24
   services:
-    - docker:20.10.16-dind
+    - docker:20.10.24-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $DOCKER_REGISTRY
     - docker build -t $DOCKER_REGISTRY/jackpot/engine:$CI_COMMIT_SHA -t $DOCKER_REGISTRY/jackpot/engine:latest -f apps/engine/Dockerfile .
@@ -66,9 +66,9 @@ build-engine:
 
 build-metrics:
   stage: build
-  image: docker:20.10.16
+  image: docker:20.10.24
   services:
-    - docker:20.10.16-dind
+    - docker:20.10.24-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $DOCKER_REGISTRY
     - docker build -t $DOCKER_REGISTRY/jackpot/metrics:$CI_COMMIT_SHA -t $DOCKER_REGISTRY/jackpot/metrics:latest -f apps/metrics/Dockerfile .
