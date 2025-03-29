@@ -1,4 +1,4 @@
-FROM oven/bun:1.0 as builder
+FROM oven/bun:1.2 as builder
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ COPY tsconfig.json ./
 RUN bun run build --filter=metrics
 
 # Production stage
-FROM oven/bun:1.0-slim
+FROM oven/bun:1.2-slim
 
 WORKDIR /app
 
