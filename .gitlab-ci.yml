@@ -17,7 +17,7 @@ cache:
 # Validate stage
 lint:
   stage: validate
-  image: oven/bun:1.0
+  image: oven/bun:1.2
   script:
     - bun install --frozen-lockfile
     - bun run lint
@@ -27,7 +27,7 @@ lint:
 
 type-check:
   stage: validate
-  image: oven/bun:1.0
+  image: oven/bun:1.2
   script:
     - bun install --frozen-lockfile
     - bun run typecheck
@@ -81,7 +81,7 @@ build-metrics:
 # Test stage
 .test-template: &test-template
   stage: test
-  image: oven/bun:1.0
+  image: oven/bun:1.2
   script:
     - bun install --frozen-lockfile
     - bun run test
